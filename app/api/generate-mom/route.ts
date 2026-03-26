@@ -1,9 +1,12 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 120;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new OpenAI({
+  apiKey: process.env.API_KEY,
+  baseURL: process.env.API_BASE_URL,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,8 +21,8 @@ export async function POST(req: NextRequest) {
       day: "numeric",
     });
 
-    const message = await anthropic.messages.create({
-      model: "claude-opus-4-6",
+    const message = await client.chat.completions.create({
+      model: process.env.API_MODEL || "auto",
       max_tokens: 4096,
       messages: [
         {
@@ -70,7 +73,7 @@ Be concise, professional, and accurate. Only include what was actually discussed
       ],
     });
 
-    const mom = message.content[0].type === "text" ? message.content[0].text : "";
+    const mom = message.choices[0].message.content || "";
     return NextResponse.json({ mom });
   } catch (err: unknown) {
     console.error("MOM generation error:", err);

@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.API_KEY,
+  baseURL: process.env.API_BASE_URL,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,16 +24,13 @@ export async function POST(req: NextRequest) {
     const buffer = await response.arrayBuffer();
     const fileBuffer = Buffer.from(buffer);
 
-    // Get filename from URL
     const urlPath = new URL(url).pathname;
     const fileName = urlPath.split("/").pop() || "audio.mp3";
 
-    // Create a File object for OpenAI
     const file = new File([fileBuffer], fileName, {
       type: response.headers.get("content-type") || "audio/mpeg",
     });
 
-    // Transcribe with Whisper
     const transcription = await openai.audio.transcriptions.create({
       file,
       model: "whisper-1",
