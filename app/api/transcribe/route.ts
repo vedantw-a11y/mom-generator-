@@ -3,11 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
 
-const openai = new OpenAI({
-  apiKey: process.env.API_KEY,
-  baseURL: process.env.API_BASE_URL,
-});
-
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json();
@@ -15,7 +10,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file URL provided" }, { status: 400 });
     }
 
-    // Download the file from Vercel Blob
+    const openai = new OpenAI({
+      apiKey: process.env.API_KEY,
+      baseURL: process.env.API_BASE_URL,
+    });
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Failed to fetch audio file");

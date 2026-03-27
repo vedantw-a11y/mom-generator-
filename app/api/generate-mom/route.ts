@@ -3,17 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 120;
 
-const client = new OpenAI({
-  apiKey: process.env.API_KEY,
-  baseURL: process.env.API_BASE_URL,
-});
-
 export async function POST(req: NextRequest) {
   try {
     const { transcript, fileName } = await req.json();
     if (!transcript) {
       return NextResponse.json({ error: "No transcript provided" }, { status: 400 });
     }
+
+    const client = new OpenAI({
+      apiKey: process.env.API_KEY,
+      baseURL: process.env.API_BASE_URL,
+    });
 
     const today = new Date().toLocaleDateString("en-IN", {
       year: "numeric",
